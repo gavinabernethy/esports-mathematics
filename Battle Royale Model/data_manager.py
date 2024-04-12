@@ -32,14 +32,14 @@ def animate_simulation(figure_para, arena, agent_list, num_still, base_filename,
     return file_path
 
 
-def create_still(i, agent_list, arena, delta, survivor_ts, total_time):
+def create_still(i, agent_list, arena, delta, survivor_ts, total_time, background_image='br_map.png'):
     plt.gca().clear()
     plt.ylim([-0.5, 0.5 + arena.height])
     plt.xlim([-0.5, 0.5 + arena.width])
     plt.xticks([])
     plt.yticks([])
     extent_vec = [-0.5, arena.width + 0.5, -0.5, arena.height + 0.5]
-    img = plt.imread("br_map.png")
+    img = plt.imread(background_image)
     plt.imshow(img, aspect='auto', extent=extent_vec,
                origin='lower', alpha=0.6, interpolation='none')
     # plt.imshow(conditions_mod, cmap='RdYlGn_r', aspect='auto', extent=extent_vec,
