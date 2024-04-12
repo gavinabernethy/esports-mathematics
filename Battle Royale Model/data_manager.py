@@ -27,7 +27,9 @@ def animate_simulation(figure_para, arena, agent_list, num_still, base_filename,
     file_path = create_fig_filename(base_filename=base_filename + '_ani', suffix='gif')
     anim = FuncAnimation(fig, create_still, interval=100, frames=int(num_still),
                          fargs=(agent_list, arena, delta, survivor_ts, total_time,))
-    anim.save(file_path, writer='pillow', fps=figure_para["ANIMATION_FPS"])
+    anim.save(file_path, writer='ffmpeg', fps=figure_para["ANIMATION_FPS"])
+
+    return file_path
 
 
 def create_still(i, agent_list, arena, delta, survivor_ts, total_time):
@@ -75,3 +77,5 @@ def create_still(i, agent_list, arena, delta, survivor_ts, total_time):
         final_text = f"Survival time: {final_pc_survival_time} \n Kills: {final_pc_kill_count}"
         plt.annotate(text=final_text, xy=(arena.width * 0.25, arena.height * 0.3),
                      annotation_clip=False, size=70, c='r')
+
+
