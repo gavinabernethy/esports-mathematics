@@ -1,13 +1,17 @@
+
 import streamlit as st
 import tempfile
 from PIL import Image
 import base64
 
+import sys
+sys.path.append('.')
 from agent import Agent, Player
 from manager import Manager
 from arena import Arena
 import data_manager
 from parameters import master_para
+import time
 
 
 main_para = master_para["main_para"]
@@ -36,6 +40,8 @@ from moviepy.editor import *
 def convert_gif_to_mp4(gif_path, mp4_path):
     clip = (VideoFileClip(gif_path))
     clip.write_videofile(mp4_path, codec='libx264')
+
+#%%
 
 def main_ui():
     st.title("Simulation: pedagogical")
