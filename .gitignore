@@ -1,0 +1,8 @@
+.DS_Store
+*.pdf
+*.png
+
+results/
+
+.idea/
+__pycache__/
