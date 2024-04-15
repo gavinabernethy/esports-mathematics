@@ -44,8 +44,16 @@ def simulation(para):
     return arena, agent_list, manager.number_of_survivors_history
 
 
+# required to help ensure correct aspect ratio
+def forceaspect(ax, aspect=1.0):
+    im = ax.get_images()
+    extent = im[0].get_extent()
+    ax.set_aspect(abs((extent[1] - extent[0]) / (extent[3] - extent[2])) / aspect)
+
+
 # %%
 
+# TODO: change program so we use absolute coordinates as player input
 def convert_coords(coord_str):
     coord_str = coord_str.strip('()')
     coords = coord_str.split(',')
@@ -87,12 +95,14 @@ def main_ui():
             # CREATE GIF
             start_time = time.time()
 
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(12, 6))
             ax.set_ylim([-0.5, 0.5 + outer_arena.height])
             ax.set_xlim([-0.5, 0.5 + outer_arena.width])
 
             # TODO: ensure correct aspect ratio
-            ax.imshow(im, aspect='auto', extent=extent_vec, origin='lower', alpha=0.6, interpolation='none')
+            ax.imshow(im, extent=extent_vec, origin='lower', alpha=0.6,
+                      interpolation='none')
+            forceaspect(ax, aspect=im.width / im.height)
             scatter = ax.scatter([], [])  # create our blank scatterplot axis
 
             # this function will create each frame of the animation
@@ -125,7 +135,7 @@ def main_ui():
 
             # SHOW animation
             start_time = time.time()
-            components.html(ani.to_jshtml(default_mode='once'), height=600)
+            components.html(ani.to_jshtml(default_mode='once'), height=800, scrolling=True)
 
             if timings:
                 st.success(f'gif displayed in {time.time() - start_time:.2f}s')
@@ -134,7 +144,9 @@ def main_ui():
         st.info("Click the button to start the simulation.")
         fig, ax = plt.subplots()
         # TODO: ensure the aspect ratio of the arena is correct
-        ax.imshow(im, aspect='auto', extent=extent_vec, origin='lower', alpha=1.0, interpolation='none')
+
+        ax.imshow(im, extent=extent_vec, origin='lower', alpha=1.0, interpolation='none')
+        forceaspect(ax, aspect=im.width / im.height)
         st.pyplot(fig)
 
 
