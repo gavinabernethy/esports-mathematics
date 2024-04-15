@@ -23,6 +23,7 @@ from PIL import Image
 main_para = master_para["main_para"]
 bg_image_path = 'br_map.png'
 timings = False
+st.set_page_config(layout="wide")
 
 
 def initialisation(para):
