@@ -38,7 +38,7 @@ def initialisation(para):
 def simulation(para):
     agent_list, arena = initialisation(para=para)
 
-    manager = Manager(arena=arena, agent_list=agent_list, show_progress_bar=True)
+    manager = Manager(arena=arena, agent_list=agent_list, show_progress_bar=False)
     manager.simulate_event(time=para["main_para"]["TIME"], delta=para["main_para"]["DELTA"])
     return arena, agent_list, manager.number_of_survivors_history
 
@@ -84,6 +84,7 @@ def main_ui():
             else:
                 st.success("Simulation complete")
 
+        with st.spinner("Doing something very important:"):
             # CREATE GIF
             start_time = time.time()
             im = Image.open(bg_image_path)
