@@ -126,7 +126,7 @@ def main_ui():
 
             # SHOW animation
             start_time = time.time()
-            components.html(ani.to_jshtml(), height=600)
+            components.html(ani.to_jshtml(default_mode='once'), height=600)
 
             if timings:
                 st.success(f'gif displayed in {time.time() - start_time:.2f}s')
