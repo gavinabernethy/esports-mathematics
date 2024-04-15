@@ -2,6 +2,7 @@ import streamlit as st
 import tempfile
 from PIL import Image
 import base64
+import streamlit.components.v1 as components
 
 import sys
 
@@ -19,6 +20,7 @@ from PIL import Image
 
 main_para = master_para["main_para"]
 bg_image_path = 'br_map.png'
+timings = False
 
 
 def initialisation(para):
@@ -59,7 +61,11 @@ def main_ui():
             start_time = time.time()
             # Execute a fresh simulation to generate new history:
             outer_arena, outer_agent_list, survivor_ts = simulation(para=master_para)
-            st.success(f"Simulation complete in {time.time() - start_time:.2f}s")
+
+            if timings:
+                st.success(f"Simulation complete in {time.time() - start_time:.2f}s")
+            else:
+                st.success("Simulation complete")
 
             # CREATE GIF
             start_time = time.time()
@@ -73,8 +79,7 @@ def main_ui():
             ax.imshow(im, aspect='auto', extent=extent_vec, origin='lower', alpha=0.6, interpolation='none')
             scatter = ax.scatter([], [])  # create our blank scatterplot axis
 
-            # this function will create each frame of the animatuion
-
+            # this function will create each frame of the animation
             def update(frame):
                 # initialise empty lists
                 xval = []
@@ -99,20 +104,15 @@ def main_ui():
             ani = FuncAnimation(fig, update, frames=100, interval=100,
                                 blit=True)  # set interval to control animation speed
 
-            st.success(f"gif created in {time.time() - start_time:.2f}s")
+            if timings:
+                st.success(f"gif created in {time.time() - start_time:.2f}s")
 
-            # SAVE GIF
+            # SHOW animation
             start_time = time.time()
-            gif_filename = os.path.join('./results', 'animation.gif')
-            ani.save(gif_filename, writer='ffmpeg', fps=master_para['figure_para']["ANIMATION_FPS"])
-            st.success(f"Animation saved to gif in {time.time() - start_time:.2f}s")
+            components.html(ani.to_jshtml(), height=600)
 
-            # SAVE MP4
-            start_time = time.time()
-            mp4_path = gif_filename.replace('.gif', '.mp4')
-            convert_gif_to_mp4(gif_filename, mp4_path)
-            st.success(f"Animation saved to mp4 in {time.time() - start_time:.2f}s")
-            st.video(mp4_path)
+            if timings:
+                st.success(f'gif displayed in {time.time() - start_time:.2f}s')
 
     else:
         st.info("Click the button to start the simulation.")
