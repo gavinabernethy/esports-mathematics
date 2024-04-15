@@ -57,6 +57,12 @@ def main_ui():
     st.title("Simulation: pedagogical")
 
     player_coords = st.text_input('Starting coordinate (%): (x,y)', "(x, y)")
+    im = Image.open(bg_image_path)
+
+    # grab arena parameters so I can create the arena plot
+    _, outer_arena = initialisation(
+        para=master_para)  # TODO: consider changing `initialisation` and `simulation` function outputs
+    extent_vec = [-0.5, outer_arena.width + 0.5, -0.5, outer_arena.height + 0.5]
 
     if st.button("Run Simulation"):
         with st.spinner("Procrastinating..."):
@@ -69,7 +75,7 @@ def main_ui():
             )
 
             # Execute a fresh simulation to generate new history:
-            outer_arena, outer_agent_list, survivor_ts = simulation(para=master_para)
+            _, outer_agent_list, survivor_ts = simulation(para=master_para)
 
             if timings:
                 st.success(f"Simulation complete in {time.time() - start_time:.2f}s")
@@ -79,11 +85,10 @@ def main_ui():
         with st.spinner("Doing something very important:"):
             # CREATE GIF
             start_time = time.time()
-            im = Image.open(bg_image_path)
+
             fig, ax = plt.subplots()
             ax.set_ylim([-0.5, 0.5 + outer_arena.height])
             ax.set_xlim([-0.5, 0.5 + outer_arena.width])
-            extent_vec = [-0.5, outer_arena.width + 0.5, -0.5, outer_arena.height + 0.5]
 
             # TODO: ensure correct aspect ratio
             ax.imshow(im, aspect='auto', extent=extent_vec, origin='lower', alpha=0.6, interpolation='none')
@@ -126,6 +131,10 @@ def main_ui():
 
     else:
         st.info("Click the button to start the simulation.")
+        fig, ax = plt.subplots()
+        # TODO: ensure the aspect ratio of the arena is correct
+        ax.imshow(im, aspect='auto', extent=extent_vec, origin='lower', alpha=1.0, interpolation='none')
+        st.pyplot(fig)
 
 
 if __name__ == "__main__":
