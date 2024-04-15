@@ -1,16 +1,18 @@
 import streamlit as st
-import tempfile
-from PIL import Image
-import base64
 import streamlit.components.v1 as components
+
+# set the maximum animation size
+import matplotlib
+
+matplotlib.rcParams['animation.embed_limit'] = 2 ** 10
 
 import sys
 
 sys.path.append('.')
+
 from agent import Agent, Player
 from manager import Manager
 from arena import Arena
-import data_manager
 from parameters import master_para
 import time
 import matplotlib.pyplot as plt
@@ -41,24 +43,39 @@ def simulation(para):
     return arena, agent_list, manager.number_of_survivors_history
 
 
-from moviepy.editor import *
+# from moviepy.editor import *
 
 
-def convert_gif_to_mp4(gif_path, mp4_path):
-    clip = (VideoFileClip(gif_path))
-    clip.write_videofile(mp4_path, codec='libx264')
+# def convert_gif_to_mp4(gif_path, mp4_path):
+#     clip = (VideoFileClip(gif_path))
+#     clip.write_videofile(mp4_path, codec='libx264')
 
 
 # %%
 
+def convert_coords(coord_str):
+    coord_str = coord_str.strip('()')
+    coords = coord_str.split(',')
+
+    coord_dict = {'STARTING_X_PERCENTAGE': float(coords[0]), 'STARTING_Y_PERCENTAGE': float(coords[1])}
+    return coord_dict
+
+
 def main_ui():
     st.title("Simulation: pedagogical")
+
+    player_coords = st.text_input('Starting coordinate (%): (x,y)', "(x, y)")
 
     if st.button("Run Simulation"):
         with st.spinner("Procrastinating..."):
 
             # SIMULATION
             start_time = time.time()
+
+            master_para['player_para'].update(
+                convert_coords(player_coords)
+            )
+
             # Execute a fresh simulation to generate new history:
             outer_arena, outer_agent_list, survivor_ts = simulation(para=master_para)
 
