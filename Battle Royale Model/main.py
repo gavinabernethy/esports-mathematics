@@ -43,14 +43,6 @@ def simulation(para):
     return arena, agent_list, manager.number_of_survivors_history
 
 
-# from moviepy.editor import *
-
-
-# def convert_gif_to_mp4(gif_path, mp4_path):
-#     clip = (VideoFileClip(gif_path))
-#     clip.write_videofile(mp4_path, codec='libx264')
-
-
 # %%
 
 def convert_coords(coord_str):
