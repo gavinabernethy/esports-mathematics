@@ -10,8 +10,8 @@ streamlit run main.py
 ## Requirements
 
 ```
-conda env export --from-history > environment.yml
-conda env create -f environment.yml
+conda env export --from-history > environment.yml # generate environment.yml 
+conda env create -f environment.yml # create new conda environment from environment.yml
 ```
 
 
