@@ -6,11 +6,13 @@ class Agent:
 
     def __init__(self,
                  agent_para,
+                 number,
                  radius=None,
                  colour_code='blue',
                  death_code='black',
                  default_survival_time=0,
                  ):
+        self.number = number
         self.agent_para = agent_para
         self.colour_code = colour_code
         self.death_code = death_code
@@ -102,16 +104,18 @@ class Agent:
 # children
 class Player(Agent):
 
-    def __init__(self, agent_para, player_para, default_survival_time):
+    def __init__(self, number, agent_para, player_para, default_survival_time):
         super().__init__(
             agent_para=agent_para,
+            number=number,
             radius=0.4,
             colour_code='red',
             death_code='brown',
             default_survival_time=default_survival_time,
         )
-        self.starting_x_percentage = player_para["STARTING_X_PERCENTAGE"]
-        self.starting_y_percentage = player_para["STARTING_Y_PERCENTAGE"]
-        self.initial_bearing = player_para["INITIAL_BEARING"]
+        self.number = number
+        self.starting_x_percentage = player_para["TEAMS"][number]["STARTING_X_PERCENTAGE"]
+        self.starting_y_percentage = player_para["TEAMS"][number]["STARTING_Y_PERCENTAGE"]
+        self.initial_bearing = player_para["TEAMS"][number]["INITIAL_BEARING"]
         self.inertia = player_para["INERTIA_WEIGHTING"]
         self.victory_probability = player_para["VICTORY_WEIGHTING"]

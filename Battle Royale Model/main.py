@@ -28,11 +28,19 @@ st.set_page_config(layout="wide")
 
 def initialisation(para):
     initial_arena = Arena(width=para["arena_para"]["WIDTH"], height=para["arena_para"]["HEIGHT"])
+    # generate list of player subclass agents
     initial_agent_list = [Player(agent_para=para["agent_para"],
+                                 number=_,
                                  player_para=para["player_para"],
-                                 default_survival_time=para["main_para"]["TIME"])]
+                                 default_survival_time=para["main_para"]["TIME"])
+                          for _ in range(main_para["NUM_PLAYERS"])]
+    # generate remaining agents
     for agent in range(para["main_para"]["NUM_AGENTS"]):
-        initial_agent_list.append(Agent(agent_para=para["agent_para"], default_survival_time=para["main_para"]["TIME"]))
+        number = main_para["NUM_PLAYERS"] + agent
+        initial_agent_list.append(Agent(agent_para=para["agent_para"],
+                                        default_survival_time=para["main_para"]["TIME"],
+                                        number=number)
+                                  )
     return initial_agent_list, initial_arena
 
 
@@ -70,9 +78,17 @@ def convert_bearing(bearing_str):
 
 def main_ui():
     st.title("Simulation: Battle Royale")
-    # TODO: Need to be able to specify multiple (up to 5) Player agents and input their independent values
-    player_coords = st.text_input('Starting coordinate (%): (x,y)', "(x, y)")
-    player_bearing = st.text_input('Starting bearing (0 - 360 degrees): \u03B8', "\u03B8")
+    # TODO: Choose player colour; improve GUI so that all team info selected on single line.
+    #  Final outcomes (kills, survival) will need to be displayed per team.
+    # setup based on number of players
+    num_players = main_para["NUM_PLAYERS"]
+    player_coords = []
+    player_bearing = []
+    for player_num in range(num_players):
+        player_coords.append(st.text_input(f'Team {player_num+1}: Starting coordinate (%): (x,y)', "(x, y)",
+                                           key=2*player_num))
+        player_bearing.append(st.text_input(f'Team {player_num+1}: Starting bearing (0 - 360 degrees): \u03B8',
+                                            "\u03B8", key=2*player_num+1))
     im = Image.open(bg_image_path)
 
     # grab arena parameters so I can create the arena plot
@@ -86,8 +102,9 @@ def main_ui():
             # SIMULATION
             start_time = time.time()
 
-            master_para['player_para'].update(convert_coords(player_coords))
-            master_para['player_para'].update(convert_bearing(player_bearing))
+            for player_num in range(num_players):
+                master_para['player_para']['TEAMS'][player_num].update(convert_coords(player_coords[player_num]))
+                master_para['player_para']['TEAMS'][player_num].update(convert_bearing(player_bearing[player_num]))
 
             # Execute a fresh simulation to generate new history:
             _, outer_agent_list, survivor_ts = simulation(para=master_para)

@@ -4,6 +4,7 @@
 
 # Core:
 main_para = {
+    "NUM_PLAYERS": 5,
     "NUM_AGENTS": 99,
     "DELTA": 0.5,
     "TIME": 100,
@@ -17,9 +18,11 @@ player_para = {
     "VICTORY_WEIGHTING": 3.0,
     "SPEED": 6,
     "INERTIA_WEIGHTING": 0.90,
-    "STARTING_X_PERCENTAGE": 70.0,  # literally a percentage from 0 to 100!
-    "STARTING_Y_PERCENTAGE": 80.0,  # literally a percentage from 0 to 100!
-    "INITIAL_BEARING": 90.0  # initial bearing (north, clockwise) from 0 to 360 degrees
+    "TEAMS": {x: {
+        "STARTING_X_PERCENTAGE": 70.0,  # literally a percentage from 0 to 100!
+        "STARTING_Y_PERCENTAGE": 80.0,  # literally a percentage from 0 to 100!
+        "INITIAL_BEARING": 90.0  # initial bearing (north, clockwise) from 0 to 360 degrees
+    } for x in range(main_para["NUM_PLAYERS"])},
 }
 
 # Agent parameters:
