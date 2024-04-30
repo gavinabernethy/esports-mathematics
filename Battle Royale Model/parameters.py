@@ -16,9 +16,10 @@ main_para = {
 player_para = {
     "VICTORY_WEIGHTING": 3.0,
     "SPEED": 6,
-    "INERTIA_WEIGHTING": 0.9,
+    "INERTIA_WEIGHTING": 0.90,
     "STARTING_X_PERCENTAGE": 70.0,  # literally a percentage from 0 to 100!
     "STARTING_Y_PERCENTAGE": 80.0,  # literally a percentage from 0 to 100!
+    "INITIAL_BEARING": 90.0  # initial bearing (north, clockwise) from 0 to 360 degrees
 }
 
 # Agent parameters:

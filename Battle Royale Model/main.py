@@ -62,10 +62,17 @@ def convert_coords(coord_str):
     return coord_dict
 
 
-def main_ui():
-    st.title("Simulation: pedagogical")
+def convert_bearing(bearing_str):
+    bearing_str = bearing_str.strip('()')
+    bearing_dict = {"INITIAL_BEARING": float(bearing_str)}
+    return bearing_dict
 
+
+def main_ui():
+    st.title("Simulation: Battle Royale")
+    # TODO: Need to be able to specify multiple (up to 5) Player agents and input their independent values
     player_coords = st.text_input('Starting coordinate (%): (x,y)', "(x, y)")
+    player_bearing = st.text_input('Starting bearing (0 - 360 degrees): \u03B8', "\u03B8")
     im = Image.open(bg_image_path)
 
     # grab arena parameters so I can create the arena plot
@@ -79,9 +86,8 @@ def main_ui():
             # SIMULATION
             start_time = time.time()
 
-            master_para['player_para'].update(
-                convert_coords(player_coords)
-            )
+            master_para['player_para'].update(convert_coords(player_coords))
+            master_para['player_para'].update(convert_bearing(player_bearing))
 
             # Execute a fresh simulation to generate new history:
             _, outer_agent_list, survivor_ts = simulation(para=master_para)
@@ -104,7 +110,6 @@ def main_ui():
                       interpolation='none')
             forceaspect(ax, aspect=im.width / im.height)
             scatter = ax.scatter([], [])  # create our blank scatterplot axis
-
             # this function will create each frame of the animation
             def update(frame):
                 # initialise empty lists
@@ -112,7 +117,7 @@ def main_ui():
                 yval = []
                 cols = []
 
-                # calculqte colours and positions of each agent
+                # calculate colours and positions of each agent
                 for agent in outer_agent_list:
                     xval.append(agent.position_history[frame][0])
                     yval.append(agent.position_history[frame][1])

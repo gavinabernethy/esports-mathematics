@@ -3,6 +3,9 @@ import streamlit as st
 from agent import Player
 
 
+# TODO: is there really much value in the Manager object? The simulation loop could be brought
+#  into main, and the initial position and bearing could be set at Agent initialisation.
+
 class Manager:
 
     def __init__(self,
@@ -19,8 +22,13 @@ class Manager:
     def set_starting_positions(self):
         for agent in self.agent_list:
             if isinstance(agent, Player):
+                # get starting position from input
                 starting_x = self.arena.width * agent.starting_x_percentage / 100.0
                 starting_y = self.arena.height * agent.starting_y_percentage / 100.0
+                # get starting directions from input bearing
+                x_mov = np.cos(np.pi / 2 - agent.initial_bearing * np.pi / 180.0)
+                y_mov = np.sin(np.pi / 2 - agent.initial_bearing * np.pi / 180.0)
+                agent.previous_direction = np.asarray([x_mov, y_mov])
             else:
                 # for NPC agents, draw from 2D Gaussian centred at centre of map
                 starting_x = np.random.normal(0.5 * self.arena.width, 0.2 * self.arena.width, 1)
@@ -45,7 +53,7 @@ class Manager:
             current_time = int(np.floor(time_step * delta))
             self.update_positions(delta, current_time)
             if self.show_progress_bar and np.mod(time_step, 10) == 0:
-                progress_bar.progress(time_step/total_steps)
+                progress_bar.progress(time_step / total_steps)
             # count survivors
             current_survivors = 0
             for agent in self.agent_list:

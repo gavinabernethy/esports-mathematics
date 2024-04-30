@@ -112,5 +112,6 @@ class Player(Agent):
         )
         self.starting_x_percentage = player_para["STARTING_X_PERCENTAGE"]
         self.starting_y_percentage = player_para["STARTING_Y_PERCENTAGE"]
+        self.initial_bearing = player_para["INITIAL_BEARING"]
         self.inertia = player_para["INERTIA_WEIGHTING"]
         self.victory_probability = player_para["VICTORY_WEIGHTING"]
