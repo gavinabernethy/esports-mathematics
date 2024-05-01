@@ -65,7 +65,6 @@ def forceaspect(ax, aspect=1.0):
 def convert_coords(coord_str):
     coord_str = coord_str.strip('()')
     coords = coord_str.split(',')
-
     coord_dict = {'STARTING_X_PERCENTAGE': float(coords[0]), 'STARTING_Y_PERCENTAGE': float(coords[1])}
     return coord_dict
 
@@ -76,20 +75,41 @@ def convert_bearing(bearing_str):
     return bearing_dict
 
 
+def convert_widget(key, string):
+    value = st.session_state[key]
+    new_dict = {string: value}
+    return new_dict
+
+
 def main_ui():
     st.title("Simulation: Battle Royale")
-    # TODO: Choose player colour; improve GUI so that all team info selected on single line.
+    # TODO: Choose player colour;
     #  Final outcomes (kills, survival) will need to be displayed per team.
     # setup based on number of players
     num_players = main_para["NUM_PLAYERS"]
     player_coords = []
     player_bearing = []
     for player_num in range(num_players):
-        col_1, col_2, buff_1, buff_2 = st.columns(4)  # looks better and room for additional attributes
-        player_coords.append(col_1.text_input(f'Team {player_num + 1}: Starting coordinate (%): (x,y)', "(x, y)",
-                                              key=2 * player_num))
-        player_bearing.append(col_2.text_input(f'Team {player_num + 1}: Starting bearing (0 - 360 degrees): \u03B8',
-                                               "\u03B8", key=2 * player_num + 1))
+        col_1, col_2, col_3, col_4, col_5 = st.columns(5)  # looks better and room for additional attributes
+        player_coords.append(col_1.text_input(f'Team {player_num + 1}: Starting coordinate (%):', "(x, y)",
+                                              key=5 * player_num))
+        player_bearing.append(col_2.text_input(f'Team {player_num + 1}: Bearing (0 - 360 degrees):',
+                                               "\u03B8", key=5 * player_num + 1))
+
+        def update(change):
+            if np.mod(change, 5) == 2:
+                st.session_state[change + 1] = (11.0 - st.session_state[change]) / 10.0
+            elif np.mod(change, 5) == 3:
+                st.session_state[change - 1] = 11.0 - 10.0 * st.session_state[change]
+
+        col_3.slider(f'Team {player_num + 1}: Attack radius (1 - 10)', min_value=1, max_value=10, value=5,
+                     key=5 * player_num + 2, on_change=update, args=(5 * player_num + 2,))
+        col_4.slider(f'Team {player_num + 1}: Kill probability (0.1 - 1)', min_value=0.1, max_value=1.0, value=0.6,
+                     key=5 * player_num + 3, on_change=update, args=(5 * player_num + 3,))
+
+        col_5.selectbox(f'Team {player_num + 1} colour:', ('red', 'orange', 'yellow', 'green', 'purple'),
+                        key=5 * player_num + 4)
+
     im = Image.open(bg_image_path)
 
     # grab arena parameters so I can create the arena plot
@@ -106,6 +126,12 @@ def main_ui():
             for player_num in range(num_players):
                 master_para['player_para']['TEAMS'][player_num].update(convert_coords(player_coords[player_num]))
                 master_para['player_para']['TEAMS'][player_num].update(convert_bearing(player_bearing[player_num]))
+                master_para['player_para']['TEAMS'][player_num].update(
+                    convert_widget(key=5 * player_num + 2, string="ATTACK_RADIUS"))
+                master_para['player_para']['TEAMS'][player_num].update(
+                    convert_widget(key=5 * player_num + 3, string="KILL_PROBABILITY"))
+                master_para['player_para']['TEAMS'][player_num].update(
+                    convert_widget(key=5 * player_num + 4, string="COLOUR"))
 
             # Execute a fresh simulation to generate new history:
             _, outer_agent_list, survivor_ts = simulation(para=master_para)

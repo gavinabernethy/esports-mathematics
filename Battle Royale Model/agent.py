@@ -7,7 +7,6 @@ class Agent:
     def __init__(self,
                  agent_para,
                  number,
-                 radius=None,
                  colour_code='blue',
                  death_code='black',
                  default_survival_time=0,
@@ -18,8 +17,8 @@ class Agent:
         self.death_code = death_code
         self.speed = agent_para["DEFAULT_SPEED"] * random.uniform(0.4, 0.6)
         self.inertia = agent_para["INERTIA_WEIGHTING"]
-        self.victory_probability = agent_para["VICTORY_WEIGHTING"]
-        self.radius = radius
+        self.kill_probability = agent_para["KILL_PROBABILITY"]
+        self.attack_radius = agent_para["ATTACK_RADIUS"]
         self.health = 1.0
         self.kills = 0
         self.survival_time = default_survival_time
@@ -43,19 +42,37 @@ class Agent:
 
     def collision_detector(self, agent, current_time):
         separation = np.linalg.norm(self.position - agent.position)
-        if separation < 3.0:
+        my_attack_radius = self.attack_radius
+        enemy_attack_radius = agent.attack_radius
+        is_kill = False
+        is_killed = False
 
-            # is collision!
-            probability_of_victory = self.victory_probability / (self.victory_probability + agent.victory_probability)
-            is_victor = bool(np.random.binomial(n=1, p=probability_of_victory, size=1))
-            if is_victor:
-                self.kills += 1
-                agent.status = 0  # DEAD
-                agent.survival_time = current_time
+        if enemy_attack_radius < separation < my_attack_radius:
+            # only I attack
+            is_kill = bool(np.random.binomial(n=1, p=self.kill_probability, size=1))
+
+        elif my_attack_radius < separation < enemy_attack_radius:
+            # only you attack
+            is_killed = bool(np.random.binomial(n=1, p=agent.kill_probability, size=1))
+
+        elif separation < min(my_attack_radius, enemy_attack_radius):
+            # both attack - one will definitely win
+            probability_of_kill = self.kill_probability / (self.kill_probability + agent.kill_probability)
+            if bool(np.random.binomial(n=1, p=probability_of_kill, size=1)):
+                is_kill = True
             else:
-                agent.kills += 1
-                self.status = 0
-                self.survival_time = current_time
+                is_killed = True
+        else:
+            pass
+        # resolve outcome
+        if is_kill:
+            self.kills += 1
+            agent.status = 0  # DEAD
+            agent.survival_time = current_time
+        if is_killed:
+            agent.kills += 1
+            self.status = 0
+            self.survival_time = current_time
 
     def calculate_new_position(self, arena, agent_list, delta, current_time):
 
@@ -108,14 +125,14 @@ class Player(Agent):
         super().__init__(
             agent_para=agent_para,
             number=number,
-            radius=0.4,
-            colour_code='red',
             death_code='brown',
             default_survival_time=default_survival_time,
         )
         self.number = number
+        self.inertia = player_para["INERTIA_WEIGHTING"]
         self.starting_x_percentage = player_para["TEAMS"][number]["STARTING_X_PERCENTAGE"]
         self.starting_y_percentage = player_para["TEAMS"][number]["STARTING_Y_PERCENTAGE"]
         self.initial_bearing = player_para["TEAMS"][number]["INITIAL_BEARING"]
-        self.inertia = player_para["INERTIA_WEIGHTING"]
-        self.victory_probability = player_para["VICTORY_WEIGHTING"]
+        self.kill_probability = player_para["TEAMS"][number]["KILL_PROBABILITY"]
+        self.attack_radius = player_para["TEAMS"][number]["ATTACK_RADIUS"]
+        self.colour_code = player_para["TEAMS"][number]["COLOUR"]
