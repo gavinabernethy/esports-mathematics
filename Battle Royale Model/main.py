@@ -85,10 +85,11 @@ def main_ui():
     player_coords = []
     player_bearing = []
     for player_num in range(num_players):
-        player_coords.append(st.text_input(f'Team {player_num+1}: Starting coordinate (%): (x,y)', "(x, y)",
-                                           key=2*player_num))
-        player_bearing.append(st.text_input(f'Team {player_num+1}: Starting bearing (0 - 360 degrees): \u03B8',
-                                            "\u03B8", key=2*player_num+1))
+        col_1, col_2, buff_1, buff_2 = st.columns(4)  # looks better and room for additional attributes
+        player_coords.append(col_1.text_input(f'Team {player_num + 1}: Starting coordinate (%): (x,y)', "(x, y)",
+                                              key=2 * player_num))
+        player_bearing.append(col_2.text_input(f'Team {player_num + 1}: Starting bearing (0 - 360 degrees): \u03B8',
+                                               "\u03B8", key=2 * player_num + 1))
     im = Image.open(bg_image_path)
 
     # grab arena parameters so I can create the arena plot
@@ -127,6 +128,7 @@ def main_ui():
                       interpolation='none')
             forceaspect(ax, aspect=im.width / im.height)
             scatter = ax.scatter([], [])  # create our blank scatterplot axis
+
             # this function will create each frame of the animation
             def update(frame):
                 # initialise empty lists

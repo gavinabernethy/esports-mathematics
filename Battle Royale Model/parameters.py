@@ -4,7 +4,7 @@
 
 # Core:
 main_para = {
-    "NUM_PLAYERS": 5,
+    "NUM_PLAYERS": 3,
     "NUM_AGENTS": 99,
     "DELTA": 0.5,
     "TIME": 100,
