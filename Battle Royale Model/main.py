@@ -83,8 +83,7 @@ def convert_widget(key, string):
 
 def main_ui():
     st.title("Simulation: Battle Royale")
-    # TODO: Choose player colour;
-    #  Final outcomes (kills, survival) will need to be displayed per team.
+
     # setup based on number of players
     num_players = main_para["NUM_PLAYERS"]
     player_coords = []
@@ -186,6 +185,21 @@ def main_ui():
             # SHOW animation
             start_time = time.time()
             components.html(ani.to_jshtml(default_mode='once'), height=800, scrolling=True)
+
+            # Final team statistics in columns beneath animation
+            team_cols = st.columns(num_players)
+            for player_num in range(num_players):
+                team_cols[player_num].header(f"Team {player_num + 1} stats:")
+                player = outer_agent_list[player_num]
+                if player.status == 1:
+                    status_str = "Alive"
+                else:
+                    status_str = "Dead"
+                team_cols[player_num].text(
+                    f"Survival status: {status_str}\n"
+                    f"Survival time: {player.survival_time}\n"
+                    f"Number of kills: {player.kills}"
+                )
 
             if timings:
                 st.success(f'gif displayed in {time.time() - start_time:.2f}s')
