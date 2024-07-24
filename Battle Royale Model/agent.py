@@ -2,6 +2,10 @@ import random
 import numpy as np
 
 
+def pythagoras(x):
+    return np.linalg.norm(x)
+
+
 class Agent:
 
     def __init__(self,
@@ -40,37 +44,40 @@ class Agent:
         self.status_history.append(self.status)
         self.kills_history.append(self.kills)
 
-    def collision_detector(self, agent, current_time):
-        separation = np.linalg.norm(self.position - agent.position)
+    def collision_detector(self, enemy, current_time):
+        separation = pythagoras(self.position - enemy.position)
         my_attack_radius = self.attack_radius
-        enemy_attack_radius = agent.attack_radius
-        is_kill = False
-        is_killed = False
-
+        enemy_attack_radius = enemy.attack_radius
         if enemy_attack_radius < separation < my_attack_radius:
             # only I attack
             is_kill = bool(np.random.binomial(n=1, p=self.kill_probability, size=1))
+            is_killed = False
 
         elif my_attack_radius < separation < enemy_attack_radius:
             # only you attack
-            is_killed = bool(np.random.binomial(n=1, p=agent.kill_probability, size=1))
+            is_killed = bool(np.random.binomial(n=1, p=enemy.kill_probability, size=1))
+            is_kill = False
 
         elif separation < min(my_attack_radius, enemy_attack_radius):
             # both attack - one will definitely win
-            probability_of_kill = self.kill_probability / (self.kill_probability + agent.kill_probability)
+            probability_of_kill = self.kill_probability / (self.kill_probability + enemy.kill_probability)
             if bool(np.random.binomial(n=1, p=probability_of_kill, size=1)):
                 is_kill = True
+                is_killed = False
             else:
                 is_killed = True
+                is_kill = False
         else:
-            pass
+            is_kill = False
+            is_killed = False
+
         # resolve outcome
         if is_kill:
             self.kills += 1
-            agent.status = 0  # DEAD
-            agent.survival_time = current_time
+            enemy.status = 0  # DEAD
+            enemy.survival_time = current_time
         if is_killed:
-            agent.kills += 1
+            enemy.kills += 1
             self.status = 0
             self.survival_time = current_time
 
@@ -86,8 +93,8 @@ class Agent:
 
             # Movement
             direction = np.asarray([np.random.normal(0, 1, 1)[0], np.random.normal(0, 1, 1)[0]])
-            if np.linalg.norm(direction) != 0.0:
-                direction = self.speed * direction / np.linalg.norm(direction)
+            if pythagoras(direction) != 0.0:
+                direction = self.speed * direction / pythagoras(direction)
             direction = self.inertia * self.previous_direction + (1.0 - self.inertia) * direction
 
             # Check for override if near boundary
@@ -101,8 +108,8 @@ class Agent:
                 direction[1] = -1
 
             # Re-normalise
-            if np.linalg.norm(direction) != 0.0:
-                direction = direction / np.linalg.norm(direction)
+            if pythagoras(direction) != 0.0:
+                direction = direction / pythagoras(direction)
 
             # Update
             self.previous_direction = direction
