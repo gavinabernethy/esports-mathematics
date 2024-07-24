@@ -26,8 +26,8 @@ class Manager:
                 starting_x = self.arena.width * agent.starting_x_percentage / 100.0
                 starting_y = self.arena.height * agent.starting_y_percentage / 100.0
                 # get starting directions from input bearing
-                x_mov = np.cos(np.pi / 2 - agent.initial_bearing * np.pi / 180.0)
-                y_mov = np.sin(np.pi / 2 - agent.initial_bearing * np.pi / 180.0)
+                x_mov = np.sin(agent.initial_bearing * np.pi / 180.0)
+                y_mov = np.cos(agent.initial_bearing * np.pi / 180.0)
                 agent.previous_direction = np.asarray([x_mov, y_mov])
             else:
                 # for NPC agents, draw from 2D Gaussian centred at centre of map
